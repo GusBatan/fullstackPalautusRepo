@@ -54,7 +54,7 @@ const App = () => {
           action={() =>
             setSelected(Math.floor(Math.random() * anecdotes.length))
           }
-        />{' '}
+        />
         <MyButton label={'vote'} action={handleVote} />
       </div>
       <div>
