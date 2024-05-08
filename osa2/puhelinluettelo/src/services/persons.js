@@ -2,27 +2,19 @@ import axios from 'axios';
 const baseUrl = 'http://localhost:3001/persons';
 
 const getAll = () => {
-  return axios.get(baseUrl).catch((error) => {
-    console.log('fail');
-  });
+  return axios.get(baseUrl);
 };
 
 const create = (newObject) => {
-  return axios.post(baseUrl, newObject).catch((error) => {
-    console.log('fail');
-  });
+  return axios.post(baseUrl, newObject);
 };
 
 const update = (id, newObject) => {
-  return axios.put(`${baseUrl}/${id}`, newObject).catch((error) => {
-    console.log('fail');
-  });
+  return axios.put(`${baseUrl}/${id}`, newObject);
 };
 
 const deletePerson = (id) => {
-  return axios.delete(`${baseUrl}/${id}`).catch((error) => {
-    console.log('fail');
-  });
+  return axios.delete(`${baseUrl}/${id}`);
 };
 
 export default {
