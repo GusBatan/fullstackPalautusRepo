@@ -1,6 +1,17 @@
+import personServices from './services/persons';
+
 const Persons = (props) => {
+  const handleClick = (person) => {
+    if (window.confirm(`Really delete ${person.name}?`)) {
+      props.handleDelete(person.id);
+    }
+  };
+
   return props.filteredPersons.map((person) => (
-    <p key={person.name}>{`${person.name} ${person.number}`}</p>
+    <div key={person.name}>
+      <p>{`${person.name} ${person.number}`}</p>
+      <button onClick={() => handleClick(person)}>Delete</button>
+    </div>
   ));
 };
 
