@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const App = () => {
   const [countries, setCountries] = useState([]);
-  const [query, setQuery] = useState('');
-  const [filteredCountries, setFilteredCountries] = useState('');
+  const [query, setQuery] = useState("");
+  const [filteredCountries, setFilteredCountries] = useState("");
 
   const handleInput = (event) => {
     event.preventDefault();
@@ -26,19 +26,6 @@ const App = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    if (query && filteredCountries.length === 1) {
-      axios
-        .get(
-          `https://studies.cs.helsinki.fi/restcountries/api/name/${filteredCountries[0].name.common}`
-        )
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [query]);
-
   return (
     <div>
       <h2>Find Countries</h2>
@@ -51,16 +38,39 @@ const App = () => {
           <div>
             <h3>Alle 10</h3>
             {filteredCountries.map((country) => {
-              return <p key={country.name.common}>{country.name.common}</p>;
+              return (
+                <div
+                  key={country.name.common}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    maxHeight: "40px",
+                    width: "250px",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <p key={country.name.common}>{country.name.common}</p>
+                  <button onClick={() => setFilteredCountries([country])}>
+                    show
+                  </button>
+                </div>
+              );
             })}
           </div>
         )}
+
       {filteredCountries.length === 1 && query && (
         <div>
-          <h3>{filteredCountries[0].name.common}</h3>
-          <p>{`capital: ${filteredCountries[0].capital[0]}`}</p>
-          <p>{`area ${filteredCountries[0].area}`}</p>
+          <h3>{filteredCountries[0]?.name?.common}</h3>
+          <p>{`capital: ${filteredCountries[0]?.capital[0]}`}</p>
+          <p>{`area ${filteredCountries[0]?.area}`}</p>
           <h4>languages:</h4>
+          <ul>
+            {Object.values(filteredCountries[0]?.languages).map((language) => (
+              <li key={language}>{language}</li>
+            ))}
+          </ul>
+          <img src={filteredCountries[0]?.flags.png} />
         </div>
       )}
       {filteredCountries.length === 0 && query && <h3>No results</h3>}
