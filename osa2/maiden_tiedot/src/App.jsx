@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import CountryInfo from "./CountryInfo";
+import CountryLister from "./CountryLister";
+
+const api_key = import.meta.env.VITE_SOME_KEY;
 
 const App = () => {
   const [countries, setCountries] = useState([]);
+  const [weatherData, setWeatherData] = useState({});
   const [query, setQuery] = useState("");
   const [filteredCountries, setFilteredCountries] = useState("");
 
@@ -26,6 +31,19 @@ const App = () => {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    if (query && filteredCountries.length === 1) {
+      axios
+        .get(
+          `https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${filteredCountries[0]?.latlng[0]}&lon=${filteredCountries[0]?.latlng[1]}&appid=${api_key}`
+        )
+        .then((res) => {
+          setWeatherData(res);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [query, filteredCountries.length]);
+
   return (
     <div>
       <h2>Find Countries</h2>
@@ -35,43 +53,17 @@ const App = () => {
         filteredCountries.length !== 1 &&
         filteredCountries.length !== 0 &&
         query && (
-          <div>
-            <h3>Alle 10</h3>
-            {filteredCountries.map((country) => {
-              return (
-                <div
-                  key={country.name.common}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    maxHeight: "40px",
-                    width: "250px",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <p key={country.name.common}>{country.name.common}</p>
-                  <button onClick={() => setFilteredCountries([country])}>
-                    show
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+          <CountryLister
+            filteredCountries={filteredCountries}
+            setFilteredCountries={setFilteredCountries}
+          />
         )}
 
       {filteredCountries.length === 1 && query && (
-        <div>
-          <h3>{filteredCountries[0]?.name?.common}</h3>
-          <p>{`capital: ${filteredCountries[0]?.capital[0]}`}</p>
-          <p>{`area ${filteredCountries[0]?.area}`}</p>
-          <h4>languages:</h4>
-          <ul>
-            {Object.values(filteredCountries[0]?.languages).map((language) => (
-              <li key={language}>{language}</li>
-            ))}
-          </ul>
-          <img src={filteredCountries[0]?.flags.png} />
-        </div>
+        <CountryInfo
+          filteredCountries={filteredCountries}
+          weatherData={weatherData}
+        />
       )}
       {filteredCountries.length === 0 && query && <h3>No results</h3>}
     </div>
