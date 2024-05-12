@@ -24,11 +24,11 @@ let persons = [
 ];
 
 app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>');
+  return response.send('<h1>Hello World!</h1>');
 });
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons);
+  return response.json(persons);
 });
 
 app.get('/info', (request, response) => {
@@ -38,7 +38,7 @@ app.get('/info', (request, response) => {
   }${currentDate.getTimezoneOffset() / -60}${
     currentDate.toString().match(/\(([^)]+)\)/)[1]
   }`;
-  response.json(
+  return response.json(
     `Phonebook has info for ${persons.length} people and the time of request is: ${formattedDate}`
   );
 });
@@ -47,9 +47,9 @@ app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id;
   const result = persons.find((person) => person.id == id);
   if (result) {
-    response.json(result);
+    return response.json(result);
   }
-  response.sendStatus(404);
+  return response.sendStatus(404);
 });
 
 app.delete('/api/persons/delete/:id', (req, res) => {
