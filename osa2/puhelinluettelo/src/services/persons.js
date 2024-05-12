@@ -1,12 +1,12 @@
 import axios from 'axios';
-const baseUrl = 'http://localhost:3001/persons';
+const baseUrl = 'http://localhost:3001/api/persons';
 
 const getAll = () => {
   return axios.get(baseUrl);
 };
 
 const create = (newObject) => {
-  return axios.post(baseUrl, newObject);
+  return axios.post(`${baseUrl}/post`, newObject);
 };
 
 const update = (id, newObject) => {
@@ -14,7 +14,7 @@ const update = (id, newObject) => {
 };
 
 const deletePerson = (id) => {
-  return axios.delete(`${baseUrl}/${id}`);
+  return axios.delete(`${baseUrl}/delete/${id}`);
 };
 
 export default {
