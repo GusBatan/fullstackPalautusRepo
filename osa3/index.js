@@ -19,72 +19,123 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error);
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
+
 app.get('/', (request, response) => {
   return response.send('<h1>Hello World!</h1>');
 });
 
-app.get('/api/persons', async (request, response) => {
-  const persons = await Person.find({});
-  return response.json(persons);
+app.get('/api/persons', async (request, response, next) => {
+  try {
+    const persons = await Person.find({});
+    return response.json(persons);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.get('/info', async (request, response) => {
+app.get('/info', async (request, response, next) => {
   const currentDate = new Date();
   const formattedDate = `${currentDate.toDateString()} ${currentDate.toLocaleTimeString()} GTM${
     currentDate.getTimezoneOffset() / -60 > 0 ? '+' : ''
   }${currentDate.getTimezoneOffset() / -60}${
     currentDate.toString().match(/\(([^)]+)\)/)[1]
   }`;
+  try {
+    const persons = await Person.find({});
 
-  const persons = await Person.find({});
-
-  return response.json(
-    `Phonebook has info for ${persons.length} people and the time of request is: ${formattedDate}`
-  );
+    return response.json(
+      `Phonebook has info for ${persons.length} people and the time of request is: ${formattedDate}`
+    );
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.get('/api/persons/:id', async (request, response) => {
+app.get('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id;
+  try {
+    const persons = await Person.find({});
 
-  const persons = await Person.find({});
-
-  const result = persons.find((person) => person.id == id);
-  if (result) {
-    return response.json(result);
-  }
-  return response.sendStatus(404);
-});
-
-app.delete('/api/persons/delete/:id', async (req, res) => {
-  const id = req.params.id;
-  let persons = await Person.find({});
-  persons = persons.filter((person) => {
-    return person.id != id;
-  });
-  res.sendStatus(200);
-});
-
-app.post('/api/persons/post', async (req, res) => {
-  const newPersonsInfo = req.body;
-  const persons = await Person.find({});
-  console.log(persons, newPersonsInfo);
-  if (newPersonsInfo.name && newPersonsInfo.number) {
-    if (persons.find((person) => person.name == newPersonsInfo.name)) {
-      return res.status(400).json({ error: 'Name must be unique' });
-    } else {
-      const person = new Person({
-        name: newPersonsInfo.name,
-        number: newPersonsInfo.number,
-        id: Math.floor(Math.random() * 1000000),
-      });
-      await person.save();
-      return res.status(200).json(`Added ${newPersonsInfo.name}`);
+    const result = persons.find((person) => person.id == id);
+    if (result) {
+      return response.json(result);
     }
+    return response.sendStatus(404);
+  } catch (error) {
+    next(error);
   }
-  return res
-    .status(400)
-    .json({ error: 'Request must include both name and number' });
 });
+
+app.delete('/api/persons/delete/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    Person.findOneAndDelete({ id: id })
+      .then((result) => {
+        res.status(204).end();
+      })
+      .catch((error) => next(error));
+
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/persons/post', async (req, res, next) => {
+  try {
+    const newPersonsInfo = req.body;
+    const persons = await Person.find({});
+    console.log(persons, newPersonsInfo);
+    if (newPersonsInfo.name && newPersonsInfo.number) {
+      if (persons.find((person) => person.name == newPersonsInfo.name)) {
+        return res.status(400).json({ error: 'Name must be unique' });
+      } else {
+        const person = new Person({
+          name: newPersonsInfo.name,
+          number: newPersonsInfo.number,
+          id: Math.floor(Math.random() * 1000000),
+        });
+        await person.save();
+        return res.status(200).json(`Added ${newPersonsInfo.name}`);
+      }
+    }
+    return res
+      .status(400)
+      .json({ error: 'Request must include both name and number' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.put('/api/persons/:id', (req, res, next) => {
+  try {
+    console.log('hello there', req.body, req.params);
+    const { name, number } = req.body;
+    const id = req.params.id;
+    Person.findOneAndUpdate({ id: id }, { name, number }, { new: true })
+      .then((updatedPerson) => {
+        res.json(updatedPerson);
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } catch (error) {
+    next(error);
+    console.log('error tuli');
+  }
+});
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
