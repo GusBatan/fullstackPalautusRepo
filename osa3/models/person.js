@@ -1,43 +1,46 @@
 const mongoose = require('mongoose');
 
+mongoose.set('strictQuery', false);
+
+const url = process.env.MONGODB_URI;
+
+mongoose
+  .connect(url)
+  .then((result) => {
+    console.log('connected to MongoDB');
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB:', error.message);
+  });
+
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
   id: Number,
 });
 
-const Person = mongoose.model('Person', personSchema);
-
 const savePersons = (name, number) => {
-  const person = new Person({
-    name,
-    number,
-    id: Math.floor(Math.random() * 1000000),
-  });
+  
   person.save().then((result) => {
-    mongoose.connection.close();
     process.exit(1);
   });
 };
 
-const findAllPersons = () => {
-  Person.find({})
-    .then((result) => {
-      console.log('phonebook: ');
-      result.forEach((person) => {
-        console.log(`${person.name}: ${person.number}`);
-      });
-    })
-    .then(() => {
-      mongoose.connection.close();
-      process.exit(1);
-    });
+const gracefulShutdown = () => {
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed due to app termination');
+    process.exit(0); // Exit the process once the connection is closed
+  });
 };
 
-if (process.argv.length === 3) {
-  findAllPersons();
-}
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down gracefully...');
+  gracefulShutdown();
+});
 
-if (process.argv.length === 5) {
-  savePersons(process.argv[3], process.argv[4]);
-}
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Shutting down gracefully...');
+  gracefulShutdown();
+});
+
+module.exports = mongoose.model('Person', personSchema);
