@@ -1,40 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.set('strictQuery', false);
-
-const url = process.env.MONGODB_URI;
-
-mongoose
-  .connect(url)
-  .then(() => {
-    console.log('connected to MongoDB');
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message);
-  });
-
-  const blogSchema = mongoose.Schema({
-    title: String,
-    author: String,
-    url: String,
-    likes: Number
-  })
-
-const gracefulShutdown = () => {
-  mongoose.connection.close(() => {
-    console.log('MongoDB connection closed due to app termination');
-    process.exit(0); // Exit the process once the connection is closed
-  });
-};
-
-process.on('SIGINT', () => {
-  console.log('Received SIGINT. Shutting down gracefully...');
-  gracefulShutdown();
+const blogSchema = mongoose.Schema({
+  title: String,
+  author: String,
+  url: String,
+  likes: Number,
 });
 
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM. Shutting down gracefully...');
-  gracefulShutdown();
-});
+const Blog = mongoose.model("Blog", blogSchema);
 
-module.exports = mongoose.model('Blog', blogSchema);
+module.exports = Blog;
