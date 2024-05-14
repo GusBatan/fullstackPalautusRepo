@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
-const mongoose = require('mongoose');
 const Person = require('./models/person');
 
 app.use(express.json());
@@ -22,7 +21,7 @@ app.use(
 const errorHandler = (error, request, response, next) => {
   console.error(error);
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' });
+    return response.status(400).send({ error: 'Cast Error' });
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
@@ -80,7 +79,7 @@ app.delete('/api/persons/delete/:id', async (req, res, next) => {
   try {
     const id = req.params.id;
     Person.findOneAndDelete({ id: id })
-      .then((result) => {
+      .then(() => {
         res.status(204).end();
       })
       .catch((error) => next(error));
@@ -122,7 +121,11 @@ app.put('/api/persons/:id', (req, res, next) => {
     console.log('hello there', req.body, req.params);
     const { name, number } = req.body;
     const id = req.params.id;
-    Person.findOneAndUpdate({ id: id }, { name, number }, { new: true })
+    Person.findOneAndUpdate(
+      { id: id },
+      { name, number },
+      { new: true, runValidators: true, context: 'query' }
+    )
       .then((updatedPerson) => {
         res.json(updatedPerson);
       })

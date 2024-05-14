@@ -41,7 +41,7 @@ const App = () => {
             )
           )
           .catch((error) => {
-            setErrorMessage(`Failed with message ${error}`);
+            setErrorMessage(`Failed with message ${error.response.data.error}`);
             setTimeout(() => {
               setErrorMessage(null);
             }, 5000);
@@ -59,6 +59,12 @@ const App = () => {
           setTimeout(() => {
             setSuccessMessage(null);
           }, 2000);
+        })
+        .catch((error) => {
+          setErrorMessage(`Failed with message ${error.response.data.error}`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         });
     }
   };
@@ -75,7 +81,7 @@ const App = () => {
   const handleDelete = (id) => {
     setPersons(persons.filter((person) => person.id !== id));
     personServices.deletePerson(id).catch((error) => {
-      setErrorMessage(`Failed with message ${error}`);
+      setErrorMessage(`Failed with message ${error.response.data.error}`);
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);

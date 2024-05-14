@@ -6,7 +6,7 @@ const url = process.env.MONGODB_URI;
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('connected to MongoDB');
   })
   .catch((error) => {
@@ -14,17 +14,20 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: { type: String, required: true, minLength: 3 },
+  number: {
+    type: String,
+    minlength: 8,
+    maxlength: 12,
+    required: true,
+    validate: {
+      validator: function (val) {
+        return /^(\d{2,3})-(\d{6,7})/.test(val);
+      },
+    },
+  },
   id: Number,
 });
-
-const savePersons = (name, number) => {
-  
-  person.save().then((result) => {
-    process.exit(1);
-  });
-};
 
 const gracefulShutdown = () => {
   mongoose.connection.close(() => {
