@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
 const Person = require('./models/person');
-
+const mongoose = require('./mongo');
 app.use(express.json());
 app.use(cors());
 app.use(express.json());
@@ -35,7 +35,7 @@ app.get('/', (request, response) => {
 
 app.get('/api/persons', async (request, response, next) => {
   try {
-    const persons = await Person.find({});
+    const persons = await Person.find({}).catch((error) => next(error));
     return response.json(persons);
   } catch (error) {
     next(error);
@@ -50,7 +50,7 @@ app.get('/info', async (request, response, next) => {
     currentDate.toString().match(/\(([^)]+)\)/)[1]
   }`;
   try {
-    const persons = await Person.find({});
+    const persons = await Person.find({}).catch((error) => next(error));
 
     return response.json(
       `Phonebook has info for ${persons.length} people and the time of request is: ${formattedDate}`
@@ -63,7 +63,7 @@ app.get('/info', async (request, response, next) => {
 app.get('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id;
   try {
-    const persons = await Person.find({});
+    const persons = await Person.find({}).catch((error) => next(error));
 
     const result = persons.find((person) => person.id == id);
     if (result) {
