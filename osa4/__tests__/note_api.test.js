@@ -17,6 +17,7 @@ const seedDatabase = async () => {
 
 // Before running tests, seed the database with a blog
 before(async () => {
+  await Blog.deleteMany({});
   await seedDatabase();
 });
 
@@ -92,7 +93,46 @@ describe('Get and POST tests', () => {
 describe('Testing delete functionalities', () => {
   test('Testing delete', async () => {
     const response = await api.get('/api/blogs');
-    console.log(response.body[0].id);
+    const blogId = response.body[0].id;
+    const responseDelete = await api.delete(`/api/blogs/${blogId}`).expect(200);
+    assert.strictEqual(
+      responseDelete.body.message,
+      'Blog deleted successfully'
+    );
+
+    const deletedBlog = await api.get('/api/blogs');
+    assert.notStrictEqual(deletedBlog.body[0].id, blogId);
+  });
+  test('test delete without id', async () => {
+    await api.delete(`/api/blogs/`).expect(404);
+  });
+});
+
+describe('Testing PUT functionalities', () => {
+  test('Testing PUT', async () => {
+    const response = await api.get('/api/blogs');
+    const blogId = response.body[0].id;
+    const likesAmountBefore = response.body[0].likes;
+    const responseUpdate = await api
+      .put(`/api/blogs/${blogId}`)
+      .send({
+        title: 'New Blog1',
+        author: 'Test Author',
+        url: 'http://example.com',
+        likes: likesAmountBefore + 1,
+      })
+      .expect(200);
+
+    assert.strictEqual(
+      responseUpdate.body.message,
+      'Blog updated successfully'
+    );
+
+    const updatedBlog = await api.get('/api/blogs');
+    assert.strictEqual(updatedBlog.body[0].likes, likesAmountBefore + 1);
+  });
+  test('test PUT with id', async () => {
+    await api.delete(`/api/blogs/`).expect(404);
   });
 });
 

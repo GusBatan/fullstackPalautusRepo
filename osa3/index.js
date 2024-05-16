@@ -118,7 +118,6 @@ app.post("/api/persons/post", async (req, res, next) => {
 
 app.put("/api/persons/:id", (req, res, next) => {
   try {
-    console.log("hello there", req.body, req.params);
     const { name, number } = req.body;
     const id = req.params.id;
     Person.findOneAndUpdate(

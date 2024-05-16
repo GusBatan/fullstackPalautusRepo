@@ -25,12 +25,30 @@ blogsRouter.delete('/:id', async (req, res, next) => {
   try {
     const response = await Blog.findOneAndDelete({ _id: id });
     if (!response) {
-      
       return res.status(404).json({ error: 'Blog not found' });
     }
     res.json({ message: 'Blog deleted successfully', response });
   } catch (exp) {
     next(exp);
+  }
+});
+
+blogsRouter.put('/:id', async (req, res, next) => {
+  try {
+    const { likes } = req.body;
+    const id = req.params.id;
+    console.log('id on:', id);
+    const response = await Blog.findOneAndUpdate(
+      { _id: id },
+      { likes },
+      { new: true, runValidators: true, context: 'query' }
+    );
+    if (!response) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+    res.json({ message: 'Blog updated successfully', response });
+  } catch (error) {
+    next(error);
   }
 });
 
