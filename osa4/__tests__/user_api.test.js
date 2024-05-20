@@ -20,6 +20,7 @@ describe('User API tests', () => {
   test('POST /api/users creates a new user', async () => {
     const newUser = {
       username: 'testuser11',
+      name: 'testuser11',
       password: 'securepassword',
     };
 
@@ -32,6 +33,7 @@ describe('User API tests', () => {
   test('POST /api/users fails with short password', async () => {
     const newUser = {
       username: 'testuser',
+      name: 'kala',
       password: 'abc',
     };
 
@@ -43,6 +45,7 @@ describe('User API tests', () => {
   test('POST /api/users fails with duplicate username', async () => {
     const newUser = {
       username: 'testuser11',
+      name: 'kala',
       password: 'ab456c',
     };
 
@@ -55,13 +58,14 @@ describe('User API tests', () => {
     const newUser = {
       username: 'testu123ser',
       password: 'ab3213c',
+      name: 'simo',
     };
     await api.post('/api/users').send(newUser).expect(200);
     const response = await api
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /application\/json/);
-    console.log('body on :', response.body);
+
     assert.equal(response.body.length, 2);
   });
 });

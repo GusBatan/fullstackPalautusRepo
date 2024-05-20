@@ -10,8 +10,8 @@ const loginRouter = require('./controllers/login');
 
 app.use(cors());
 app.use(express.json());
-
 app.use(middleware.tokenExtractor);
+
 morgan.token('body', (req) => {
   return JSON.stringify(req.body);
 });
