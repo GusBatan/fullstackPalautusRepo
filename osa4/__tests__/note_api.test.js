@@ -15,27 +15,26 @@ const seedDatabase = async () => {
   });
 };
 
-// Before running tests, seed the database with a blog
 before(async () => {
   await Blog.deleteMany({});
   await seedDatabase();
 });
 
-// After running tests, clean up the database
 after(async () => {
   await Blog.deleteMany({});
   await mongoose.connection.close();
 });
 
-test('notes are returned as json and length is 1', async () => {
-  const response = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
-  assert.strictEqual(response.body.length, 1);
-});
-
 describe('Get and POST tests', () => {
+
+  test('notes are returned as json and length is 1', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+    assert.strictEqual(response.body.length, 1);
+  });
+
   test('Returned blogs array objects id field is named id, not _id', async () => {
     const response = await api
       .get('/api/blogs')
@@ -131,7 +130,7 @@ describe('Testing PUT functionalities', () => {
     const updatedBlog = await api.get('/api/blogs');
     assert.strictEqual(updatedBlog.body[0].likes, likesAmountBefore + 1);
   });
-  test('test PUT with id', async () => {
+  test('test PUT without id', async () => {
     await api.delete(`/api/blogs/`).expect(404);
   });
 });
