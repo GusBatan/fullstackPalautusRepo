@@ -5,6 +5,17 @@ const User = require('../models/user');
 
 loginRouter.post('/', async (request, response, next) => {
   const { username, password } = request.body;
+
+  if (!username || !password) {
+    return response.status(400).json({ error: 'No username or password' });
+  }
+
+  if (username.length < 3 || password.length < 3) {
+    return response
+      .status(400)
+      .json({ error: 'Username or password too short' });
+  }
+
   try {
     const user = await User.findOne({ username });
     const passwordCorrect =
@@ -27,6 +38,7 @@ loginRouter.post('/', async (request, response, next) => {
       .status(200)
       .send({ token, username: user.username, name: user.name });
   } catch (e) {
+    console.log('#here');
     next(e);
   }
 });
