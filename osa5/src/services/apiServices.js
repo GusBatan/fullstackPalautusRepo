@@ -19,7 +19,6 @@ const logIn = async ({ username, password, setError, setUserData }) => {
     setUserData(JSON.parse(userData));
     setToken(JSON.parse(userData));
   } catch (er) {
-    console.log(er);
     setError(er.response.data);
     setTimeout(() => {
       setError(null);
@@ -35,11 +34,12 @@ const postBlog = async ({
   setBlogs,
   blogs,
   setMessage,
+  setToggleVisibility,
 }) => {
   const config = {
     headers: { Authorization: window.localStorage.getItem('token') },
   };
-  console.log('config: ', blogTitle, blogAuthor, blogUrl);
+
   try {
     const response = await axios.post(
       '/api/blogs',
@@ -59,6 +59,7 @@ const postBlog = async ({
         url: response.data.url,
       })
     );
+    setToggleVisibility(false);
     setMessage('Added blog');
     setTimeout(() => {
       setMessage(null);
@@ -71,4 +72,39 @@ const postBlog = async ({
   }
 };
 
-export default { getAll, logIn, postBlog };
+const putBlog = async ({ blogId, user, likes, author, title, url }) => {
+  const config = {
+    headers: { Authorization: window.localStorage.getItem('token') },
+  };
+
+  try {
+    const response = await axios.put(
+      `/api/blogs/${blogId}`,
+      {
+        user,
+        title,
+        author,
+        url,
+        likes,
+      },
+      config
+    );
+    return response;
+  } catch (e) {
+    return e;
+  }
+};
+
+const deleteBlog = async ({ blogId }) => {
+  const config = {
+    headers: { Authorization: window.localStorage.getItem('token') },
+  };
+  try {
+    const response = await axios.delete(`/api/blogs/${blogId}`, config);
+    return response;
+  } catch (e) {
+    return e;
+  }
+};
+
+export default { getAll, logIn, postBlog, putBlog, deleteBlog };

@@ -6,14 +6,17 @@ import AddBlogs from './components/AddBlogs';
 import Notifications from './components/Notifications';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    blogService.getAll().then((blogs) => {
+      const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+      return setBlogs(sortedBlogs);
+    });
+  }, [message]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('userData');
@@ -51,7 +54,12 @@ const App = () => {
         setMessage={setMessage}
       />
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          setError={setError}
+          setMessage={setMessage}
+          key={blog.id}
+          blog={blog}
+        />
       ))}
     </div>
   );

@@ -1,5 +1,5 @@
 const Notifications = ({ error, message }) => (
-  <div>
+  <div style={{ position: 'fixed' }}>
     {error && (
       <h3
         style={{
