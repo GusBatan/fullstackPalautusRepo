@@ -26,49 +26,29 @@ const logIn = async ({ username, password, setError, setUserData }) => {
   }
 };
 
-const postBlog = async ({
-  blogTitle,
-  blogAuthor,
-  blogUrl,
-  setError,
-  setBlogs,
-  blogs,
-  setMessage,
-  setToggleVisibility,
-}) => {
+const postBlog = async ({ title, author, url }) => {
+  console.log(
+    'tmäämäääääääääääääääääääääääääääääääääääääää',
+    title,
+    author,
+    url
+  );
   const config = {
     headers: { Authorization: window.localStorage.getItem('token') },
   };
-
   try {
     const response = await axios.post(
       '/api/blogs',
       {
-        title: blogTitle,
-        author: blogAuthor,
-        url: blogUrl,
+        title,
+        author,
+        url,
       },
       config
     );
-    setBlogs(
-      blogs.concat({
-        title: response.data.title,
-        author: response.data.author,
-        likes: response.data.likes,
-        id: response.data.id,
-        url: response.data.url,
-      })
-    );
-    setToggleVisibility(false);
-    setMessage('Added blog');
-    setTimeout(() => {
-      setMessage(null);
-    }, 3000);
-  } catch (er) {
-    setError(er.response.data);
-    setTimeout(() => {
-      setError(null);
-    }, 3000);
+    return response.data;
+  } catch (error) {
+    return error;
   }
 };
 

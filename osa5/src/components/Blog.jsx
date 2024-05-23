@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'; // Import useState, useRef, useEffect
 import apiServices from '../services/apiServices';
+import LikeButton from './LikeButton';
 
 const Blog = ({ blog, setError, setMessage }) => {
   const [visible, setVisible] = useState(false);
@@ -69,17 +70,21 @@ const Blog = ({ blog, setError, setMessage }) => {
 
   return (
     <div style={blogStyle}>
-      <h3 style={{ cursor: 'pointer' }} onClick={toggleVisibility}>
+      <h3
+        style={{ cursor: 'pointer' }}
+        className='toggleVisibility'
+        onClick={toggleVisibility}
+      >
         {blog.title} by {blog.author}
       </h3>
 
-      <div ref={detailsRef} style={detailsStyle}>
+      <div ref={detailsRef} style={detailsStyle} className={'toggleableDiv'}>
         <div>
           <p>{blog.url}</p>
           <div></div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <p>Likes: {likes}</p>
-            <button onClick={handleLikeClick}>like</button>
+            <LikeButton onClick={handleLikeClick} />
             <button onClick={handleDeleteClick}>delete</button>
           </div>
         </div>

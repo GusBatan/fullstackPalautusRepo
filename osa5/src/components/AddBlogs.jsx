@@ -10,16 +10,37 @@ const AddBlogs = ({ setError, setBlogs, blogs, setMessage }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    apiServices.postBlog({
-      blogTitle,
+    console.log(
+      'jandlebuseruioawierjmp0 wearoawejirjwpaoeri',
       blogAuthor,
-      blogUrl,
-      setError,
-      setBlogs,
-      blogs,
-      setMessage,
-      setToggleVisibility,
-    });
+      blogTitle,
+      blogUrl
+    );
+    try {
+      const newBlog = await apiServices.postBlog({
+        title: blogTitle,
+        author: blogAuthor,
+        url: blogUrl,
+      });
+
+      if (newBlog?.response?.data?.error) {
+        setError(newBlog.response.data);
+        setTimeout(() => setError(null), 3000);
+      } else {
+        setBlogs(blogs.concat(newBlog));
+        setMessage(
+          `A new blog "${newBlog.title}" by ${newBlog.author} added with url ${newBlog.url}`
+        );
+        setTimeout(() => setMessage(null), 3000);
+        setToggleVisibility(false);
+        setBlogTitle('');
+        setBlogAuthor('');
+        setBlogUrl('');
+      }
+    } catch (error) {
+      setError('Failed to add the blog');
+      setTimeout(() => setError(null), 3000);
+    }
   };
 
   return (
@@ -28,32 +49,32 @@ const AddBlogs = ({ setError, setBlogs, blogs, setMessage }) => {
         onClick={() => setToggleVisibility(!toggleVisibility)}
         style={{ display: toggleVisibility ? 'none' : '' }}
       >
-        new note
+        new blog
       </button>
       <form
         onSubmit={handleSubmit}
         style={{ display: toggleVisibility ? '' : 'none' }}
       >
         <div>
-          <label>Title:</label>
+          <label htmlFor='title'>Title:</label>
           <input
             type='text'
-            id='Title'
+            id='title'
             value={blogTitle}
             onChange={(e) => setBlogTitle(e.target.value)}
           />
         </div>
         <div>
-          <label>Author:</label>
+          <label htmlFor='author'>Author:</label>
           <input
             type='text'
-            id='Author'
+            id='author'
             value={blogAuthor}
             onChange={(e) => setBlogAuthor(e.target.value)}
           />
         </div>
         <div>
-          <label>url:</label>
+          <label htmlFor='url'>URL:</label>
           <input
             type='text'
             id='url'
