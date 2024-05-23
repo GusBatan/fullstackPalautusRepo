@@ -1,6 +1,5 @@
-const LikeButton = ({ handleLikeClick }) => {
-
-  return <button onClick={handleLikeClick}>like</button>;
+const LikeButton = ({ onClick }) => {
+  return <button onClick={onClick}>like</button>;
 };
 
 export default LikeButton;

@@ -35,6 +35,7 @@ const Blog = ({ blog, setError, setMessage }) => {
   }, [visible]);
 
   const handleLikeClick = async () => {
+    console.log('painoin');
     const newLikes = likes + 1;
     setLikes(newLikes);
     const response = await apiServices.putBlog({

@@ -43,7 +43,7 @@ describe('Blog component', () => {
     cleanup();
     const mockHandler = vi.fn();
     const user = userEvent.setup();
-    render(<LikeButton handleLikeClick={mockHandler} />);
+    render(<LikeButton onClick={mockHandler} />);
     const button = screen.getByText('like');
     await user.click(button);
     await user.click(button);
