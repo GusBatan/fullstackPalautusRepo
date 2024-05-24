@@ -66,6 +66,6 @@ describe('User API tests', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/);
 
-    assert.equal(response.body.length, 2);
+    assert.equal(response.body.length, 3);
   });
 });

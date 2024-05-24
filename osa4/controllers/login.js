@@ -36,9 +36,8 @@ loginRouter.post('/', async (request, response, next) => {
 
     response
       .status(200)
-      .send({ token, username: user.username, name: user.name });
+      .send({ token, username: user.username, name: user.name, id: user._id });
   } catch (e) {
-    console.log('#here');
     next(e);
   }
 });

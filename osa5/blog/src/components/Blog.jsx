@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'; // Import useState, useRef,
 import apiServices from '../services/apiServices';
 import LikeButton from './LikeButton';
 
-const Blog = ({ blog, setError, setMessage }) => {
+const Blog = ({ userData, blog, setError, setMessage }) => {
   const [visible, setVisible] = useState(false);
   const detailsRef = useRef(null);
   const [likes, setLikes] = useState(blog.likes);
@@ -35,7 +35,6 @@ const Blog = ({ blog, setError, setMessage }) => {
   }, [visible]);
 
   const handleLikeClick = async () => {
-    console.log('painoin');
     const newLikes = likes + 1;
     setLikes(newLikes);
     const response = await apiServices.putBlog({
@@ -81,12 +80,12 @@ const Blog = ({ blog, setError, setMessage }) => {
 
       <div ref={detailsRef} style={detailsStyle} className={'toggleableDiv'}>
         <div>
-          <p>{blog.url}</p>
+          <p>{`Blog URL: ${blog.url}`}</p>
           <div></div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <p>Likes: {likes}</p>
             <LikeButton onClick={handleLikeClick} />
-            <button onClick={handleDeleteClick}>delete</button>
+            {blog?.user?.id === userData?.id && <button onClick={handleDeleteClick}>delete</button>}
           </div>
         </div>
       </div>

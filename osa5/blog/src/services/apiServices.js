@@ -27,12 +27,6 @@ const logIn = async ({ username, password, setError, setUserData }) => {
 };
 
 const postBlog = async ({ title, author, url }) => {
-  console.log(
-    'tmäämäääääääääääääääääääääääääääääääääääääää',
-    title,
-    author,
-    url
-  );
   const config = {
     headers: { Authorization: window.localStorage.getItem('token') },
   };

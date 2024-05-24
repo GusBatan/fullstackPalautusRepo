@@ -16,7 +16,7 @@ const App = () => {
       const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
       return setBlogs(sortedBlogs);
     });
-  }, [message]);
+  }, [message, userData]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('userData');
@@ -55,6 +55,7 @@ const App = () => {
       />
       {blogs.map((blog) => (
         <Blog
+        userData={userData}
           setError={setError}
           setMessage={setMessage}
           key={blog.id}

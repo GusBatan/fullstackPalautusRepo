@@ -10,12 +10,6 @@ const AddBlogs = ({ setError, setBlogs, blogs, setMessage }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(
-      'jandlebuseruioawierjmp0 wearoawejirjwpaoeri',
-      blogAuthor,
-      blogTitle,
-      blogUrl
-    );
     try {
       const newBlog = await apiServices.postBlog({
         title: blogTitle,

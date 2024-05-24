@@ -58,7 +58,7 @@ describe('Get and POST tests', () => {
     const initialResponse = await api.get('/api/blogs');
     const initialLength = initialResponse.body.length;
 
-    await api
+    const res = await api
       .post('/api/blogs')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
@@ -74,6 +74,7 @@ describe('Get and POST tests', () => {
   });
 
   test('If likes object is null or undefined, its set to 0', async () => {
+    console.log('userToken', userToken);
     await api
       .post('/api/blogs')
       .set('Authorization', `Bearer ${userToken}`)
