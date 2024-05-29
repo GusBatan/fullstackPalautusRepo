@@ -5,18 +5,19 @@ import Login from './login/Login';
 import AddBlogs from './components/AddBlogs';
 import NotificationContext from './components/Notification/NotificationContent';
 import Notifications from './components/Notification/Notifications';
+import { useQuery } from '@tanstack/react-query';
 
 const App = () => {
-  const { state, dispatch } = useContext(NotificationContext);
+  const { dispatch } = useContext(NotificationContext);
   const [userData, setUserData] = useState(null);
-  const [blogs, setBlogs] = useState([]);
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
-      return setBlogs(sortedBlogs);
-    });
-  }, [state.message, userData]);
+  const blogs = useQuery({
+    queryFn: blogService.getAll,
+    queryKey: ['blogs'],
+    select: (data) => {
+      return data.sort((a, b) => b.likes - a.likes);
+    },
+  });
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('userData');
@@ -43,7 +44,9 @@ const App = () => {
       </div>
     );
   }
-
+  if (blogs?.isLoading) {
+    return <div>Blogs loading...</div>;
+  }
   return (
     <div>
       <Notifications />
@@ -54,13 +57,11 @@ const App = () => {
       </div>
       <AddBlogs
         setError={(message) => dispatch({ type: 'setError', payload: message })}
-        setBlogs={setBlogs}
-        blogs={blogs}
         setMessage={(message) =>
           dispatch({ type: 'setMessage', payload: message })
         }
       />
-      {blogs.map((blog) => (
+      {blogs?.data.map((blog) => (
         <Blog
           userData={userData}
           setError={(message) =>

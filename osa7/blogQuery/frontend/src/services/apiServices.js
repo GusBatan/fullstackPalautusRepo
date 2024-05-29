@@ -20,9 +20,6 @@ const logIn = async ({ username, password, setError, setUserData }) => {
     setToken(JSON.parse(userData));
   } catch (er) {
     setError(er.response.data);
-    setTimeout(() => {
-      setError(null);
-    }, 3000);
   }
 };
 

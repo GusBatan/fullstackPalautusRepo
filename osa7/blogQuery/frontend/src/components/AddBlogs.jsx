@@ -1,40 +1,40 @@
 import { useState } from 'react';
 import apiServices from '../services/apiServices';
 import PropTypes from 'prop-types';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 
-const AddBlogs = ({ setError, setBlogs, blogs, setMessage }) => {
+const AddBlogs = ({ setError, setMessage }) => {
   const [blogTitle, setBlogTitle] = useState('');
   const [blogAuthor, setBlogAuthor] = useState('');
   const [blogUrl, setBlogUrl] = useState('');
   const [toggleVisibility, setToggleVisibility] = useState('');
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const newBlog = await apiServices.postBlog({
-        title: blogTitle,
-        author: blogAuthor,
-        url: blogUrl,
-      });
+  const queryClient = useQueryClient();
 
-      if (newBlog?.response?.data?.error) {
-        setError(newBlog.response.data);
-        setTimeout(() => setError(null), 3000);
-      } else {
-        setBlogs(blogs.concat(newBlog));
-        setMessage(
-          `A new blog "${newBlog.title}" by ${newBlog.author} added with url ${newBlog.url}`
-        );
-        setTimeout(() => setMessage(null), 3000);
-        setToggleVisibility(false);
-        setBlogTitle('');
-        setBlogAuthor('');
-        setBlogUrl('');
-      }
-    } catch (error) {
-      setError('Failed to add the blog');
-      setTimeout(() => setError(null), 3000);
-    }
+  const mutation = useMutation({
+    mutationFn: apiServices.postBlog,
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries('blogs');
+      setMessage(
+        `A new blog "${newBlog.title}" by ${newBlog.author} added with url ${newBlog.url}`
+      );
+      setToggleVisibility(false);
+      setBlogTitle('');
+      setBlogAuthor('');
+      setBlogUrl('');
+    },
+    onError: (error) => {
+      setError(error.response?.data || 'Failed to add the blog');
+    },
+  });
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    mutation.mutate({
+      title: blogTitle,
+      author: blogAuthor,
+      url: blogUrl,
+    });
   };
 
   return (
@@ -84,8 +84,6 @@ const AddBlogs = ({ setError, setBlogs, blogs, setMessage }) => {
 
 AddBlogs.propTypes = {
   setError: PropTypes.func.isRequired,
-  setBlogs: PropTypes.func.isRequired,
-  blogs: PropTypes.array.isRequired,
   setMessage: PropTypes.func.isRequired,
 };
 

@@ -46,11 +46,9 @@ const Blog = ({ userData, blog, setError, setMessage }) => {
     });
     if (response.data.error) {
       setError(response.data.error);
-      setTimeout(() => setError(null), 3000);
     }
     if (response.data.message) {
       setMessage(response.data.message);
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -59,11 +57,9 @@ const Blog = ({ userData, blog, setError, setMessage }) => {
       const response = await apiServices.deleteBlog({ blogId: blog.id });
       if (response.message) {
         setError({ error: `Failed with message ${response.message}` });
-        setTimeout(() => setError(null), 3000);
       }
       if (response.status) {
         setMessage('Succesfully deleted');
-        setTimeout(() => setMessage(null), 3000);
       }
     }
   };
