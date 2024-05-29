@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import NotificationContext from './NotificationContent';
+import NotificationContext from './NotificationContext';
 
-const Notifications = ({ error, message }) => {
+const Notifications = () => {
   const { state } = useContext(NotificationContext);
   return (
     <div style={{ position: 'fixed' }}>
@@ -16,7 +16,7 @@ const Notifications = ({ error, message }) => {
             borderRadius: '5px',
           }}
         >
-          {`Error: ${state.error.error}`}
+          {`Error: ${state.error}`}
         </h3>
       )}
       {state.message && (

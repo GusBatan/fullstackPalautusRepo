@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect } from 'react'; // Import useState, useRef, useEffect
-import apiServices from '../services/apiServices';
+import { useState, useRef, useEffect, useContext } from 'react'; // Import useState, useRef, useEffect
+import apiServices from '../services/apiServices.js';
 import LikeButton from './LikeButton';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import LoginContext from '../login/LoginContextProvider.jsx';
 
-const Blog = ({ userData, blog, setError, setMessage }) => {
+const Blog = ({ blog, setError, setMessage }) => {
+  const { state: loginState } =
+    useContext(LoginContext);
+
   const [visible, setVisible] = useState(false);
   const detailsRef = useRef(null);
-  const [likes, setLikes] = useState(blog.likes);
-
   const blogStyle = {
     border: '1px solid blue',
     padding: '10px',
@@ -34,33 +37,45 @@ const Blog = ({ userData, blog, setError, setMessage }) => {
     }
   }, [visible]);
 
-  const handleLikeClick = async () => {
-    const newLikes = likes + 1;
-    setLikes(newLikes);
-    const response = await apiServices.putBlog({
-      blogId: blog.id,
-      likes: newLikes,
-      author: blog.author,
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: apiServices.putBlog,
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries('blogs');
+      setMessage(`You liked blog ${newBlog.data.response.title}`);
+    },
+    onError: (error) => {
+      setError(error.response?.data || 'Failed to add the blog');
+    },
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: apiServices.deleteBlog,
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries('blogs');
+      setMessage('Succesfully deleted');
+    },
+    onError: (error) => {
+      setError({ error: `Failed with message ${response.message}` });
+    },
+  });
+
+  const handleLikeClick = async (event) => {
+    mutation.mutate({
       title: blog.title,
+      author: blog.author,
       url: blog.url,
+      blogId: blog.id,
+      likes: blog.likes + 1,
     });
-    if (response.data.error) {
-      setError(response.data.error);
-    }
-    if (response.data.message) {
-      setMessage(response.data.message);
-    }
   };
 
   const handleDeleteClick = async () => {
     if (window.confirm(`Really remove blog ${blog.title}?`)) {
-      const response = await apiServices.deleteBlog({ blogId: blog.id });
-      if (response.message) {
-        setError({ error: `Failed with message ${response.message}` });
-      }
-      if (response.status) {
-        setMessage('Succesfully deleted');
-      }
+      mutationDelete.mutate({
+        blogId: blog.id,
+      });
     }
   };
 
@@ -79,9 +94,11 @@ const Blog = ({ userData, blog, setError, setMessage }) => {
           <p>{`Blog URL: ${blog.url}`}</p>
           <div></div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <p>Likes: {likes}</p>
+            <p>Likes: {blog.likes}</p>
             <LikeButton onClick={handleLikeClick} />
-            {blog?.user?.id === userData?.id && <button onClick={handleDeleteClick}>delete</button>}
+            {blog?.user?.id === loginState?.userData?.id && (
+              <button onClick={handleDeleteClick}>delete</button>
+            )}
           </div>
         </div>
       </div>

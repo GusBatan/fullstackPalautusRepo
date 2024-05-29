@@ -24,7 +24,7 @@ const AddBlogs = ({ setError, setMessage }) => {
       setBlogUrl('');
     },
     onError: (error) => {
-      setError(error.response?.data || 'Failed to add the blog');
+      setError('Failed to add the blog', error.code);
     },
   });
 

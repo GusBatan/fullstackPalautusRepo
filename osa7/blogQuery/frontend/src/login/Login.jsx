@@ -1,13 +1,39 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import apiServices from '../services/apiServices';
+import LoginContext from './LoginContextProvider';
+import NotificationContext from '../components/Notification/NotificationContext';
 
-const Login = ({ setUserData, setError }) => {
+const Login = () => {
+  const { dispatch: loginDispatch } = useContext(LoginContext);
+  const { dispatch: notificationDispatch } = useContext(NotificationContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await apiServices.logIn({ username, password, setError, setUserData });
+    try {
+      const response = await apiServices.logIn({ username, password });
+      if (response?.data?.token) {
+        loginDispatch({
+          type: 'setUserData',
+          payload: response.data,
+        });
+        notificationDispatch({
+          type: 'setMessage',
+          payload: `Logged in as ${response.data.username}`,
+        });
+      } else {
+        notificationDispatch({
+          type: 'setError',
+          payload: `Unable to login with error ${response}`,
+        });
+      }
+    } catch (er) {
+      notificationDispatch({
+        type: 'setError',
+        payload: `Error with message ${er.response.data}`,
+      });
+    }
   };
 
   return (

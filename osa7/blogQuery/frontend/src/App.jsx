@@ -1,16 +1,16 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import Blog from './components/Blog';
 import blogService from './services/apiServices';
 import Login from './login/Login';
 import AddBlogs from './components/AddBlogs';
-import NotificationContext from './components/Notification/NotificationContent';
+import NotificationContext from './components/Notification/NotificationContext';
 import Notifications from './components/Notification/Notifications';
+import LoginContext from './login/LoginContextProvider';
 import { useQuery } from '@tanstack/react-query';
 
 const App = () => {
   const { dispatch } = useContext(NotificationContext);
-  const [userData, setUserData] = useState(null);
-
+  const { state: loginState , dispatch: loginDispatch} = useContext(LoginContext);
   const blogs = useQuery({
     queryFn: blogService.getAll,
     queryKey: ['blogs'],
@@ -19,28 +19,15 @@ const App = () => {
     },
   });
 
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('userData');
-    if (loggedUserJSON) {
-      setUserData(JSON.parse(loggedUserJSON));
-    }
-  }, []);
-
   const handleLogout = () => {
-    setUserData(null);
-    localStorage.setItem('userData', null);
+    loginDispatch({type: 'clear'});
   };
 
-  if (!userData?.token) {
+  if (!loginState?.userData?.token) {
     return (
       <div>
         <Notifications />
-        <Login
-          setUserData={setUserData}
-          setError={(message) =>
-            dispatch({ type: 'setError', payload: message })
-          }
-        />
+        <Login />
       </div>
     );
   }
@@ -52,7 +39,7 @@ const App = () => {
       <Notifications />
       <h2>blogs</h2>
       <div>
-        <p>{`${userData.name} has logged in`}</p>
+        <p>{`${loginState.userData.name} has logged in`}</p>
         <button onClick={handleLogout}>logout</button>
       </div>
       <AddBlogs
@@ -63,7 +50,6 @@ const App = () => {
       />
       {blogs?.data.map((blog) => (
         <Blog
-          userData={userData}
           setError={(message) =>
             dispatch({ type: 'setError', payload: message })
           }

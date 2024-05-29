@@ -1,9 +1,8 @@
 import axios from 'axios';
 const baseUrl = '/api/blogs';
 
-const setToken = (newToken) => {
-  const token = `Bearer ${newToken.token}`;
-  localStorage.setItem('token', token);
+const getToken = (newToken) => {
+  return `Bearer ${newToken}`;
 };
 
 const getAll = () => {
@@ -11,21 +10,19 @@ const getAll = () => {
   return request.then((response) => response.data);
 };
 
-const logIn = async ({ username, password, setError, setUserData }) => {
+const logIn = async ({ username, password }) => {
   try {
     const response = await axios.post('/api/login', { username, password });
-    const userData = JSON.stringify(response.data);
-    localStorage.setItem('userData', userData);
-    setUserData(JSON.parse(userData));
-    setToken(JSON.parse(userData));
+    return response;
   } catch (er) {
-    setError(er.response.data);
+    return er;
   }
 };
 
 const postBlog = async ({ title, author, url }) => {
+  const token = JSON.parse(window.localStorage.getItem('userData')).token;
   const config = {
-    headers: { Authorization: window.localStorage.getItem('token') },
+    headers: { Authorization: getToken(token) },
   };
   try {
     const response = await axios.post(
@@ -39,13 +36,14 @@ const postBlog = async ({ title, author, url }) => {
     );
     return response.data;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 
 const putBlog = async ({ blogId, user, likes, author, title, url }) => {
+  const token = JSON.parse(window.localStorage.getItem('userData')).token;
   const config = {
-    headers: { Authorization: window.localStorage.getItem('token') },
+    headers: { Authorization: getToken(token) },
   };
 
   try {
@@ -67,8 +65,9 @@ const putBlog = async ({ blogId, user, likes, author, title, url }) => {
 };
 
 const deleteBlog = async ({ blogId }) => {
+  const token = JSON.parse(window.localStorage.getItem('userData')).token;
   const config = {
-    headers: { Authorization: window.localStorage.getItem('token') },
+    headers: { Authorization: getToken(token) },
   };
   try {
     const response = await axios.delete(`/api/blogs/${blogId}`, config);
