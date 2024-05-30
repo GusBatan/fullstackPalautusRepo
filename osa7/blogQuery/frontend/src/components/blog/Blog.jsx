@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useContext } from 'react'; // Import useState, useRef, useEffect
-import apiServices from '../services/apiServices.js';
-import LikeButton from './LikeButton';
+import apiServices from '../../services/apiServices.js';
+import LikeButton from '../LikeButton';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import LoginContext from '../login/LoginContextProvider.jsx';
+import LoginContext from '../../login/LoginContextProvider.jsx';
 
 const Blog = ({ blog, setError, setMessage }) => {
   const { state: loginState } =

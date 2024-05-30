@@ -1,9 +1,9 @@
 import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Blog from './Blog';
-import LikeButton from './LikeButton';
+import LikeButton from '../LikeButton';
 import AddBlogs from './AddBlogs';
-import apiServices from '../services/apiServices';
+import apiServices from '../../services/apiServices';
 
 describe('Blog component', () => {
   let container;

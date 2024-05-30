@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import apiServices from '../services/apiServices';
+import apiServices from '../../services/apiServices';
 import PropTypes from 'prop-types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
