@@ -88,4 +88,33 @@ blogsRouter.put('/:id', async (req, res, next) => {
   }
 });
 
+blogsRouter.post(
+  '/:id',
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const { comment } = request.body;
+    const blogId = request.params.id;
+    const requestUser = request.user;
+
+    if (!requestUser) {
+      return response
+        .status(401)
+        .json({ error: 'User, token missing or invalid' });
+    }
+    try {
+      const blog = await Blog.findById(blogId);
+      if (!blog) {
+        return response.status(404).json({ error: 'Blog not found' });
+      }
+      blog.comments.push({ content: comment, user: requestUser._id });
+      await blog.save();
+      response
+        .status(201)
+        .json({ message: 'Comment added successfully', comment });
+    } catch (exp) {
+      next(exp);
+    }
+  }
+);
+
 module.exports = blogsRouter;

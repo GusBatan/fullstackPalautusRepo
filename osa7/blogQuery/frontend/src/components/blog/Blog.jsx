@@ -1,21 +1,26 @@
-import { useState, useRef, useEffect, useContext } from 'react'; // Import useState, useRef, useEffect
+import { useState, useRef, useEffect, useContext } from 'react';
 import apiServices from '../../services/apiServices.js';
 import LikeButton from '../LikeButton';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import LoginContext from '../../login/LoginContextProvider.jsx';
+import { Link } from 'react-router-dom';
+import NotificationContext from '../Notification/NotificationContext.jsx';
 
-const Blog = ({ blog, setError, setMessage }) => {
-  const { state: loginState } =
-    useContext(LoginContext);
+const Blog = ({ blog }) => {
+  const { dispatch } = useContext(NotificationContext);
+  const { state: loginState } = useContext(LoginContext);
 
   const [visible, setVisible] = useState(false);
   const detailsRef = useRef(null);
   const blogStyle = {
-    border: '1px solid blue',
+    border: '2px solid #39FF14',
+    minWidth: '300px',
     padding: '10px',
     marginBottom: '10px',
-    borderRadius: '2px',
     boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease-in-out',
   };
 
   const detailsStyle = {
@@ -43,25 +48,38 @@ const Blog = ({ blog, setError, setMessage }) => {
     mutationFn: apiServices.putBlog,
     onSuccess: (newBlog) => {
       queryClient.invalidateQueries('blogs');
-      setMessage(`You liked blog ${newBlog.data.response.title}`);
+      dispatch({
+        type: 'setMessage',
+        payload: `You liked blog ${newBlog.data.response.title}`,
+      });
     },
     onError: (error) => {
-      setError(error.response?.data || 'Failed to add the blog');
+      dispatch({
+        type: 'setError',
+        payload: `'Failed to add the blog' ${error.response?.data}`,
+      });
     },
   });
 
   const mutationDelete = useMutation({
     mutationFn: apiServices.deleteBlog,
-    onSuccess: (newBlog) => {
+    onSuccess: () => {
       queryClient.invalidateQueries('blogs');
-      setMessage('Succesfully deleted');
+      dispatch({
+        type: 'setMessage',
+        payload: `Successfully deleted`,
+      });
     },
     onError: (error) => {
-      setError({ error: `Failed with message ${response.message}` });
+      dispatch({
+        type: 'setError',
+        payload: `Failed with message ${error.message}`,
+      });
     },
   });
 
   const handleLikeClick = async (event) => {
+    event.stopPropagation();
     mutation.mutate({
       title: blog.title,
       author: blog.author,
@@ -71,33 +89,40 @@ const Blog = ({ blog, setError, setMessage }) => {
     });
   };
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = async (event) => {
+    event.stopPropagation();
     if (window.confirm(`Really remove blog ${blog.title}?`)) {
-      mutationDelete.mutate({
-        blogId: blog.id,
-      });
+      mutationDelete.mutate({ blogId: blog.id });
     }
   };
 
   return (
-    <div style={blogStyle}>
-      <h3
-        style={{ cursor: 'pointer' }}
-        className='toggleVisibility'
-        onClick={toggleVisibility}
-      >
-        {blog.title} by {blog.author}
+    <div style={blogStyle} onClick={toggleVisibility}>
+      <h3 className='toggleVisibility'>
+        <Link to={`/blogs/${blog.id}`}>
+          {blog.title} by {blog.author}
+        </Link>
+        <span  style={{ color: '#39FF14', margin: '10px' }}>
+          {visible ? '▼' : '▲'}
+        </span>
       </h3>
-
       <div ref={detailsRef} style={detailsStyle} className={'toggleableDiv'}>
         <div>
           <p>{`Blog URL: ${blog.url}`}</p>
           <div></div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <p>Likes: {blog.likes}</p>
             <LikeButton onClick={handleLikeClick} />
             {blog?.user?.id === loginState?.userData?.id && (
-              <button onClick={handleDeleteClick}>delete</button>
+              <button style={{ marginLeft: '5px' }} onClick={handleDeleteClick}>
+                delete
+              </button>
             )}
           </div>
         </div>

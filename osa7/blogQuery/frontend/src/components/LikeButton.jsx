@@ -1,5 +1,5 @@
 const LikeButton = ({ onClick }) => {
-  return <button onClick={onClick}>like</button>;
+  return <button style={{marginLeft:'5px'}} onClick={onClick}>like</button>;
 };
 
 export default LikeButton;

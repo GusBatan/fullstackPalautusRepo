@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 
 const Users = ({ blogs }) => {
-    
   const groupedBlogs = blogs?.data?.reduce((acc, blog) => {
     if (!acc[blog.user.id]) {
       acc[blog.user.id] = { name: blog.user.name, blogs: [] };
@@ -12,7 +11,8 @@ const Users = ({ blogs }) => {
 
   return (
     <div>
-      <h1>Users</h1>
+      <h1 style={{
+    textAlign: 'center'}}>Users</h1>
       <table>
         <thead>
           <tr>
@@ -24,7 +24,11 @@ const Users = ({ blogs }) => {
           {groupedBlogs &&
             Object.keys(groupedBlogs).map((author) => (
               <tr key={author}>
-                <td><Link to={`/users/${author}`}>{groupedBlogs[author].name}</Link></td>
+                <td>
+                  <Link to={`/users/${author}`}>
+                    {groupedBlogs[author].name}
+                  </Link>
+                </td>
                 <td>{groupedBlogs[author].blogs.length}</td>
               </tr>
             ))}

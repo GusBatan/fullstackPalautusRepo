@@ -4,7 +4,7 @@ import NotificationContext from './NotificationContext';
 const Notifications = () => {
   const { state } = useContext(NotificationContext);
   return (
-    <div style={{ position: 'fixed' }}>
+    <div style={{ position: 'fixed', top: '50px' }}>
       {state.error && (
         <h3
           style={{

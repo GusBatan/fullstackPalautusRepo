@@ -77,4 +77,21 @@ const deleteBlog = async ({ blogId }) => {
   }
 };
 
-export default { getAll, logIn, postBlog, putBlog, deleteBlog };
+const postComment = async ({ blogId, comment }) => {
+  const token = JSON.parse(window.localStorage.getItem('userData')).token;
+  const config = {
+    headers: { Authorization: getToken(token) },
+  };
+  try {
+    const response = await axios.post(
+      `/api/blogs/${blogId}`,
+      { comment },
+      config
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export default { getAll, logIn, postBlog, putBlog, deleteBlog, postComment };

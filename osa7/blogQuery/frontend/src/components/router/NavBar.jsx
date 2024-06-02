@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 
 const NavBar = () => {
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%',     position: 'absolute',
+        top: '20px'}}>
             <nav>
                 <Link to="/">Home</Link>{' '}
                 <Link to="/users">Users</Link>
