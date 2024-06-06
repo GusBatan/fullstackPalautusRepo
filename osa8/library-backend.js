@@ -1,5 +1,6 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
+const { v1: uuid } = require('uuid');
 
 let authors = [
   {
@@ -98,7 +99,15 @@ let books = [
 */
 
 const typeDefs = `
-
+type Mutation {
+  editAuthor(name: String!, bornYear: Int!): Author
+  addBook(    
+    title: String!
+    published: Int!
+    author: String!
+    genres: [String!]
+   ): Book
+}
   type Book {
     title: String!
     published: Int!
@@ -109,7 +118,7 @@ const typeDefs = `
   type Query {
     bookCount: Int
     authorCount: Int
-    allBooks(author: String!): [Book!]!
+    allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
   }
 
@@ -123,11 +132,47 @@ const typeDefs = `
 `;
 
 const resolvers = {
+  Mutation: {
+    addBook: (root, args) => {
+      const newBook = { ...args, id: uuid() };
+      books = books.concat(newBook);
+
+      let author = authors.find((author) => author.name === args.author);
+      if (!author) {
+        author = {
+          name: args.author,
+          id: uuid(),
+        };
+        authors = authors.concat(author);
+      }
+
+      return newBook;
+    },
+    editAuthor: (root, args) => {
+      const author = authors.find((a) => a.name === args.name);
+      if (!author) {
+        return null;
+      }
+
+      const updatedAuthor = { ...author, born: args.bornYear };
+      authors = authors.map((author) => (author.name === args.name ? updatedAuthor : author));
+      return updatedAuthor;
+    },
+  },
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: (root, args) => {
-      return books.filter((book) => book.author === args.author);
+      let booksLocal = books;
+      if (args.genre) {
+        booksLocal = booksLocal.filter((book) =>
+          book.genres.includes(args.genre)
+        );
+      }
+      if (args.author) {
+        booksLocal = booksLocal.filter((book) => book.author === args.author);
+      }
+      return booksLocal;
     },
     allAuthors: () => {
       return authors.map((author) => {
