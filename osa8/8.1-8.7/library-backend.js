@@ -100,7 +100,7 @@ let books = [
 
 const typeDefs = `
 type Mutation {
-  editAuthor(name: String!, bornYear: Int!): Author
+  editAuthor(name: String!, born: Int!): Author
   addBook(    
     title: String!
     published: Int!
@@ -154,7 +154,7 @@ const resolvers = {
         return null;
       }
 
-      const updatedAuthor = { ...author, born: args.bornYear };
+      const updatedAuthor = { ...author, born: args.born };
       authors = authors.map((author) => (author.name === args.name ? updatedAuthor : author));
       return updatedAuthor;
     },
