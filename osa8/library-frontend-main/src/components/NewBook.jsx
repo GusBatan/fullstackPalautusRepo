@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-
-
 const NewBook = (props) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -9,18 +7,14 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState('');
   const [genres, setGenres] = useState([]);
 
-
   if (!props.show) {
     return null;
   }
 
   const submit = async (event) => {
     event.preventDefault();
-    console.log(typeof published);
     const publisedNumber = Number(published);
-    props.createBook({
-      variables: { title, author, published: publisedNumber, genres },
-    });
+    props.createBook(title, author, publisedNumber, genres);
     console.log('add book...');
 
     setTitle('');

@@ -1,14 +1,14 @@
-const Books = (props) => {
+const Recommend = (props) => {
   if (!props.show) {
     return null;
   }
 
-  const { books, genres, setGenreQuery } = props;
+  const { books, genre } = props;
 
   return (
     <div>
-      <h2>books</h2>
-
+      <h2>Recommendations</h2>
+      <p>{`Books in your facourite genre ${genre}`}</p>
       <table>
         <tbody>
           <tr>
@@ -25,17 +25,8 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
-      <div>
-        <p>Select By Genres:</p>
-        <button onClick={() => setGenreQuery(null)}>All Genres</button>
-        {genres.map((genre) => (
-          <button key={genre} onClick={() => setGenreQuery(genre)}>
-            {genre}
-          </button>
-        ))}
-      </div>
     </div>
   );
 };
 
-export default Books;
+export default Recommend;
