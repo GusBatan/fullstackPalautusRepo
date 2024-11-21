@@ -13,6 +13,7 @@ const ADDRESS = 'http://localhost:3000/api/diaries';
 const App = () => {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const weatherTypes = ['sunny', 'rainy', 'cloudy', 'stormy', 'windy'];
@@ -41,21 +42,22 @@ const App = () => {
       }
     };
 
-    fetchDiaryEntries();
+    fetchDiaryEntries().then(() => console.log("fetched diaries"));
   }, []);
 
   const handleInput = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    name: string
   ) => {
-    const { name, value } = event.target;
+    const { value } = event.target;
     setNewEntry((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+  const handleChange = (event: ChangeEvent<HTMLInputElement>, name: string) => {
+    const { value } = event.target;
     if (name === 'weather' && weatherTypes.includes(value)) {
       setNewEntry((prevState) => ({
         ...prevState,
@@ -82,9 +84,9 @@ const App = () => {
       });
     } catch (err) {
       if (axios.isAxiosError<ValidationError, Record<string, unknown>>(err)) {
-        setError('Failed to add new diary entry');
+        setSaveError('Failed to add new diary entry');
       } else {
-        setError('Unexpected error occurred');
+        setSaveError('Unexpected error occurred');
       }
     }
   };
@@ -98,75 +100,78 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h1>Diary Entries</h1>
-      <form onSubmit={handleSubmit}>
+      <div>
+        <h1>Diary Entries</h1>
         <div>
-          <h2>Date:</h2>
-          <input
-            type='date'
-            name='date'
-            value={newEntry.date}
-            onChange={handleInput}
-            required
-          />
+          {saveError}
         </div>
-        <div>
-          <h2>Weather:</h2>
+        <form onSubmit={handleSubmit}>
           <div>
-            {weatherTypes.map((type) => (
-              <label key={type}>
-                <input
-                  onChange={handleChange}
-                  type='radio'
-                  value={type}
-                  checked={newEntry.weather === type}
-                />
-                {type}
-              </label>
-            ))}
+            <h2>Date:</h2>
+            <input
+                type='date'
+                name='date'
+                value={newEntry.date}
+                onChange={e => handleInput(e, 'date')}
+                required
+            />
           </div>
-        </div>
-        <div>
-          <h2>Visibility:</h2>
           <div>
-            {visibilityLevels.map((type) => (
-              <label key={type}>
-                <input
-                  onChange={handleChange}
-                  type='radio'
-                  value={type}
-                  checked={newEntry.visibility === type}
-                />
-                {type}
-              </label>
-            ))}
+            <h2>Weather:</h2>
+            <div>
+              {weatherTypes.map((type) => (
+                  <label key={type}>
+                    <input
+                        onChange={e => handleChange(e, 'weather')}
+                        type='radio'
+                        value={type}
+                        checked={newEntry.weather === type}
+                    />
+                    {type}
+                  </label>
+              ))}
+            </div>
           </div>
-        </div>
-        <div>
-          <h2>Comment:</h2>
-          <textarea value={newEntry.comment} onChange={handleInput} />
-        </div>
-        <button type='submit'>Add</button>
-      </form>
-      <h2>Diart entries</h2>
-      <ul>
-        {diaryEntries.map((entry) => (
-          <li key={entry.id}>
-            <p>
-              <b>Date:</b> {entry.date}
-            </p>
-            <p>
-              <b>Weather:</b> {entry.weather}
-            </p>
-            <p>
-              <b>Visibility:</b> {entry.visibility}
-            </p>
-            {entry.comment && <p>Comment: {entry.comment}</p>}
-          </li>
-        ))}
-      </ul>
-    </div>
+          <div>
+            <h2>Visibility:</h2>
+            <div>
+              {visibilityLevels.map((type) => (
+                  <label key={type}>
+                    <input
+                        onChange={e => handleChange(e, 'visibility')}
+                        type='radio'
+                        value={type}
+                        checked={newEntry.visibility === type}
+                    />
+                    {type}
+                  </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h2>Comment:</h2>
+            <textarea value={newEntry.comment} onChange={e => handleInput(e, 'comment')}/>
+          </div>
+          <button type='submit'>Add</button>
+        </form>
+        <h2>Diary entries</h2>
+        <ul>
+          {diaryEntries.map((entry) => (
+              <li key={entry.id}>
+                <p>
+                  <b>Date:</b> {entry.date}
+                </p>
+                <p>
+                  <b>Weather:</b> {entry.weather}
+                </p>
+                <p>
+                  <b>Visibility:</b> {entry.visibility}
+                </p>
+                {entry.comment && <p>Comment: {entry.comment}</p>}
+              </li>
+          ))}
+        </ul>
+      </div>
   );
 };
 
